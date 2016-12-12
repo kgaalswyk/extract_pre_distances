@@ -59,7 +59,7 @@ def add_noise(dia, para):
 	return noisy_dia, noisy_para
 
 def noise_avg(rs):
-    #if rs val > 100, then gamma was zero
+    #if rs val > 100, then gamma was zero (1e-5)
     rs = np.array(rs)
     rs[rs>100]= 0
     avg = np.average(rs, axis=0)
@@ -92,11 +92,11 @@ def compute_ratio(ir, name):
 
 
 def compute_gamma(ratios, ir):
-    #rework to use np array from compute_ratio
     gammas_full = []
     for ratio in ratios:
         gammas = []
         for ra, r2 in zip(ratio, ir['r2']):
+			#check if ratio in bounds [0,1]
             if (ra>1):
                 ra=1
             if (ra<0.0):
@@ -113,7 +113,6 @@ def compute_gamma(ratios, ir):
 
 
 def compute_distance(gammas_full,pre):
-    #rework to use np array from compute_ratio
     K = 1.23e-32 * 1e-12 # cm^6 s^-2 * m^6/cm^6 = m^6 s^-2
     tc = 8e-9 # ns
     omega_H = 700e6 # s^-1
@@ -123,6 +122,7 @@ def compute_distance(gammas_full,pre):
     for gammas in gammas_full:
         rs = []
         for gamma in gammas:
+			#handle cases where ratio<0
             if gamma<1e-6:
                 gamma = 1e-10
             r6 = K * f / gamma
